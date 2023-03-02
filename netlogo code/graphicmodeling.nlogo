@@ -23,7 +23,7 @@ to setup
       set color white
       set gender "men"
       set hidden? not hidden?
-      setxy one-of [pxcor] of patches with [pcolor = black] one-of [pycor] of patches with [pcolor != black]
+      setxy -20 one-of [1 0 -1]
 
   ]
  create-Workers 325 [
@@ -31,7 +31,7 @@ to setup
       set shape "person"
       set color white
       set gender "women"
-      setxy one-of [pxcor] of patches with [pcolor = black] one-of [pycor] of patches with [pcolor = black]
+      setxy -20 one-of [1 0 -1]
   ]
 
 
@@ -41,41 +41,43 @@ to setup
       set shape "person"
       set color green
       set gender "men"
-    setxy one-of [pxcor] of patches with [pcolor = black  and not any? turtles-here]  one-of [pycor] of patches with [pcolor = black and not any? turtles-here]
+    setxy -20 one-of [1 0 -1]
   ]
   create-Non-workers 175[
       set hidden? not hidden?
       set shape "person"
       set color green
       set gender "women"
-     setxy one-of [pxcor] of patches with [pcolor = black] one-of [pycor] of patches with [pcolor = black]
+     ;setxy one-of [pxcor] of patches with [pcolor = black] one-of [pycor] of patches with [pcolor = black]
+      setxy -20 one-of [1 0 -1]
   ]
 
    ; yellow : supermarkets,  orange : restaurant,  magenta : clothes,  blue : hardware & electronic store   pink : hairdresser
-  ask n-of number-supermarket patches with [ any? neighbors with [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 ) and (pxcor > -20 and pxcor < 20 )  ] [ set pcolor yellow ask neighbors [set pcolor yellow]  ]
-  ask n-of number-restaurant patches with [any? neighbors with [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 ) and (pxcor > -20 and pxcor < 20 ) ] [    set pcolor orange ask neighbors [set pcolor orange] ]
-  ask n-of number-clothes patches with [any? neighbors with [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 )and (pxcor > -20 and pxcor < 20 )] [    set pcolor magenta  ask neighbors [set pcolor magenta] ]
-  ask n-of number-Hardware-store patches with [any? neighbors with [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 )and (pxcor > -20 and pxcor < 20 )] [    set pcolor blue ask neighbors [set pcolor blue] ]
-  ask n-of number-hairdresser patches with [any? neighbors with [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 )and (pxcor > -20 and pxcor < 20 )] [    set pcolor pink ask neighbors [set pcolor pink]  ]
+  ask n-of number-supermarket patches with [ all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 ) and (pxcor > -20 and pxcor < 20 )  ] [ set pcolor yellow ask neighbors [set pcolor yellow]  ]
+  ask n-of number-restaurant patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 ) and (pxcor > -20 and pxcor < 20 ) ] [    set pcolor orange ask neighbors [set pcolor orange] ]
+  ask n-of number-clothes patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 )and (pxcor > -20 and pxcor < 20 )] [    set pcolor magenta  ask neighbors [set pcolor magenta] ]
+  ask n-of number-Hardware-store patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 )and (pxcor > -20 and pxcor < 20 )] [    set pcolor blue ask neighbors [set pcolor blue] ]
+  ask n-of number-hairdresser patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 )and (pxcor > -20 and pxcor < 20 )] [    set pcolor pink ask neighbors [set pcolor pink]  ]
   init-income
-  ;ask patches [if pcolor = red [ask neighbors [set pcolor red]]]
   ;draw the entrance
-  ask patches with [pxcor = -3 and pycor = 1  ] [set pcolor red]
+  ask patches with [pxcor = -20 and pycor = 1  ] [set pcolor red]
+  ask patches with [pxcor = -20 and pycor = 0  ] [set pcolor red]
+  ask patches with [pxcor = -20 and pycor = -1  ] [set pcolor red]
 
 END
 
 
 to setup-mall
 
-  if ( pycor = 4 ) [ set pcolor white ]
-  if ( pycor = 3 ) [ set pcolor white ]
-  if ( pycor = 2 ) [ set pcolor white ]
-  if ( pycor = 1 ) [ set pcolor white ]
-  if ( pycor = 0 ) [ set pcolor white ]
-  if ( pycor = -1 ) [ set pcolor white ]
-  if ( pycor = -2 ) [ set pcolor white ]
-  if ( pycor = -3 ) [ set pcolor white ]
-  if ( pycor = -4 ) [ set pcolor white ]
+  if ( pycor = 4 ) [ set pcolor grey ]
+  if ( pycor = 3 ) [ set pcolor grey ]
+  if ( pycor = 2 ) [ set pcolor grey ]
+  if ( pycor = 1 ) [ set pcolor grey ]
+  if ( pycor = 0 ) [ set pcolor grey ]
+  if ( pycor = -1 ) [ set pcolor grey ]
+  if ( pycor = -2 ) [ set pcolor grey ]
+  if ( pycor = -3 ) [ set pcolor grey ]
+  if ( pycor = -4 ) [ set pcolor grey ]
  ; to add number coordinates to interface screen
 
 
@@ -349,7 +351,7 @@ number-supermarket
 number-supermarket
 0
 100
-1.0
+5.0
 1
 1
 NIL
@@ -364,7 +366,7 @@ number-hairdresser
 number-hairdresser
 0
 50
-1.0
+4.0
 1
 1
 NIL
@@ -379,7 +381,7 @@ number-Hardware-store
 number-Hardware-store
 0
 50
-1.0
+3.0
 1
 1
 NIL
@@ -394,7 +396,7 @@ number-clothes
 number-clothes
 0
 50
-1.0
+5.0
 1
 1
 NIL
@@ -409,7 +411,7 @@ number-restaurant
 number-restaurant
 0
 50
-1.0
+7.0
 1
 1
 NIL
