@@ -12,59 +12,76 @@ globals [
 
 to setup
   clear-all
-  ask patches [set pcolor black ]
+  ask patches [ setup-mall  ]
 
   ; create the mall
-  ask patches with [pxcor < 10 and pycor < 5 and  pxcor > -10 and pycor > -5 ] [ set pcolor gray ]
+  ;ask patches with [pxcor < 10 and pycor < 5 and  pxcor > -10 and pycor > -5 ] [ set pcolor gray ]
 
   ; create The Workers
- ; create-Workers 325 [
- ;     set shape "person"
- ;     set color white
- ;;     set gender "men"
-    ;  setxy one-of [pxcor] of patches with [pcolor = cyan] one-of [pycor] of patches with [pcolor != cyan]
- ; ]
-; create-Workers 325 [
-  ;    set shape "person"
-  ;    set color white
-  ;    set gender "women"
-  ;    setxy one-of [pxcor] of patches with [pcolor = cyan] one-of [pycor] of patches with [pcolor = cyan]
-  ;]
+  create-Workers 325 [
+      set shape "person"
+      set color white
+      set gender "men"
+      set hidden? not hidden?
+      setxy one-of [pxcor] of patches with [pcolor = black] one-of [pycor] of patches with [pcolor != black]
+
+  ]
+ create-Workers 325 [
+      set hidden? not hidden?
+      set shape "person"
+      set color white
+      set gender "women"
+      setxy one-of [pxcor] of patches with [pcolor = black] one-of [pycor] of patches with [pcolor = black]
+  ]
 
 
   ; create The Non-Workers
   create-Non-workers 175 [
+      set hidden? not hidden?
       set shape "person"
       set color green
       set gender "men"
     setxy one-of [pxcor] of patches with [pcolor = black  and not any? turtles-here]  one-of [pycor] of patches with [pcolor = black and not any? turtles-here]
   ]
-  ;create-Non-workers 175[
-  ;    set shape "person"
-  ;    set color green
-  ;    set gender "women"
-  ;    setxy one-of [pxcor] of patches with [pcolor = cyan] one-of [pycor] of patches with [pcolor = cyan]
-  ;]
+  create-Non-workers 175[
+      set hidden? not hidden?
+      set shape "person"
+      set color green
+      set gender "women"
+     setxy one-of [pxcor] of patches with [pcolor = black] one-of [pycor] of patches with [pcolor = black]
+  ]
 
-   ; yellow : supermarkets,  red : restaurant,  magenta : clothes,  blue : hardware & electronic store   pink : hairdresser
-  ask n-of number-supermarket patches with [pcolor = gray and not any? turtles-here ] [    set pcolor yellow  ]
-  ask n-of number-restaurant patches with [pcolor = gray and not any? turtles-here] [    set pcolor red  ]
-  ask n-of number-clothes patches with [pcolor = gray and not any? turtles-here] [    set pcolor magenta  ]
-  ask n-of number-Hardware-store patches with [pcolor = gray and not any? turtles-here] [    set pcolor blue  ]
-  ask n-of number-hairdresser patches with [pcolor = gray and not any? turtles-here] [    set pcolor pink  ]
-  ;init-income
-
+   ; yellow : supermarkets,  orange : restaurant,  magenta : clothes,  blue : hardware & electronic store   pink : hairdresser
+  ask n-of number-supermarket patches with [ any? neighbors with [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 ) and (pxcor > -20 and pxcor < 20 )  ] [ set pcolor yellow ask neighbors [set pcolor yellow]  ]
+  ask n-of number-restaurant patches with [any? neighbors with [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 ) and (pxcor > -20 and pxcor < 20 ) ] [    set pcolor orange ask neighbors [set pcolor orange] ]
+  ask n-of number-clothes patches with [any? neighbors with [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 )and (pxcor > -20 and pxcor < 20 )] [    set pcolor magenta  ask neighbors [set pcolor magenta] ]
+  ask n-of number-Hardware-store patches with [any? neighbors with [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 )and (pxcor > -20 and pxcor < 20 )] [    set pcolor blue ask neighbors [set pcolor blue] ]
+  ask n-of number-hairdresser patches with [any? neighbors with [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 )and (pxcor > -20 and pxcor < 20 )] [    set pcolor pink ask neighbors [set pcolor pink]  ]
+  init-income
+  ;ask patches [if pcolor = red [ask neighbors [set pcolor red]]]
+  ;draw the entrance
+  ask patches with [pxcor = -3 and pycor = 1  ] [set pcolor red]
 
 END
 
+
+to setup-mall
+
+  if ( pycor = 4 ) [ set pcolor white ]
+  if ( pycor = 3 ) [ set pcolor white ]
+  if ( pycor = 2 ) [ set pcolor white ]
+  if ( pycor = 1 ) [ set pcolor white ]
+  if ( pycor = 0 ) [ set pcolor white ]
+  if ( pycor = -1 ) [ set pcolor white ]
+  if ( pycor = -2 ) [ set pcolor white ]
+  if ( pycor = -3 ) [ set pcolor white ]
+  if ( pycor = -4 ) [ set pcolor white ]
+ ; to add number coordinates to interface screen
+
+
+end
 to init-income
- ; ;ask Workers [set income x]
-  ;let x random-float 1
-  ;let i 0
-  ;while [ i <= 350 ]
-  ;[
-  ; set i ( i + 1 )
-  ;]
+
   ask Workers [
    let y random-float 1
    if y >= 0 and  y < 0.25     [set income 700]
@@ -277,13 +294,12 @@ if y >= 0.9990122748838457 and  y < 0.99908447265625     [set income 3899.999999
 
   ]
 
-
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
 10
-1011
+751
 448
 -1
 -1
@@ -297,15 +313,15 @@ GRAPHICS-WINDOW
 1
 1
 1
--30
-30
+-20
+20
 -16
 16
 0
 0
 1
 ticks
-40.0
+30.0
 
 BUTTON
 51
