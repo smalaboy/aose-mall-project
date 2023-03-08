@@ -1,0 +1,57 @@
+module xpand.example.Generator
+
+import org.eclipse.emf.mwe.utils.Reader
+import org.eclipse.emf.mwe.utils.StandaloneSetup
+import org.eclipse.emf.mwe.utils.DirectoryCleaner
+import org.eclipse.xtend.typesystem.emf.EmfRegistryMetaModel
+import org.eclipse.xtend.check.CheckComponent
+import org.eclipse.xpand2.Generator
+import org.eclipse.xpand2.output.JavaBeautifier
+import org.eclipse.xtend.expression.ResourceManagerDefaultImpl
+
+var modelUri  = "platform:/resource/my.generator.projectAOSE/src/Model.xmi"
+var dirSrcGen = "src-gen"
+
+
+Workflow {
+	/* set up EMF for standalone execution */
+	bean = StandaloneSetup { platformUri="." }
+
+	/** instantiate metamodel */
+	bean = EmfRegistryMetaModel : mm_emf { }
+
+	bean = JavaBeautifier : formatter_java { }
+
+	/* load model and store it in slot 'model' */
+	component = Reader {
+		uri = modelUri
+		modelSlot = "model"
+	}
+
+	/* check model */
+	component = CheckComponent {
+		metaModel = mm_emf
+		checkFile = "metamodel::Checks"
+		emfAllChildrenSlot = "model"
+	}
+
+	/** Clear output directory */
+	component = DirectoryCleaner {
+		directory = dirSrcGen
+	}
+
+	/* generate code */
+	component = Generator {
+		metaModel = mm_emf
+		expand = "template::Template::model FOR model"
+		outlet = {
+			path = dirSrcGen
+			postprocessor = formatter_java
+			fileEncoding = "ISO-8859-1" // this is the encoding for files written the outlet
+		}
+		// configure Xpand resource encoding (check project resource setting)
+		resourceManager = ResourceManagerDefaultImpl {
+			fileEncoding = "ISO-8859-1"
+		}
+	}
+}

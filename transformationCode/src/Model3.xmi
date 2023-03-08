@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statechart:Model
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:statechart="http://statechart/1.0"
+    name="sonny">
+  <nodes name="Citizen"
+      type="OR">
+    <Children
+        name="in_mall"
+        type="OR">
+      <Children
+          type="START"/>
+      <Children
+          name="in_shop"
+          type="BASIC"/>
+      <Children
+          name="Evaluate proposal"
+          type="BASIC"/>
+      <Children
+          type="CONDITION"/>
+      <Children
+          name="Purchase started"
+          type="BASIC"/>
+      <Children
+          name="Checking out"
+          type="BASIC"/>
+      <Children
+          type="CONDITION"/>
+      <Children
+          type="CONDITION"/>
+      <Children
+          type="CONDITION"/>
+      <Children
+          type="END"/>
+    </Children>
+    <Children
+        type="START"/>
+    <Children
+        type="END"/>
+  </nodes>
+  <transitions
+      TE="need to purchase[can buy]/enter mall"
+      source="//@nodes.0/@Children.1"
+      target="//@nodes.0/@Children.0"/>
+  <transitions
+      TE="select shop"
+      source="//@nodes.0/@Children.0/@Children.0"
+      target="//@nodes.0/@Children.0/@Children.1"/>
+  <transitions
+      source="//@nodes.0/@Children.0/@Children.1"
+      target="//@nodes.0/@Children.0/@Children.3"/>
+  <transitions
+      TE="with assistance / receive proposal"
+      source="//@nodes.0/@Children.0/@Children.3"
+      target="//@nodes.0/@Children.0/@Children.2"/>
+  <transitions
+      TE="no assistance"
+      source="//@nodes.0/@Children.0/@Children.3"
+      target="//@nodes.0/@Children.0/@Children.4"/>
+  <transitions
+      TE="purchase finished/chekout"
+      source="//@nodes.0/@Children.0/@Children.4"
+      target="//@nodes.0/@Children.0/@Children.5"/>
+  <transitions
+      TE="checkout completed"
+      source="//@nodes.0/@Children.0/@Children.5"
+      target="//@nodes.0/@Children.0/@Children.6"/>
+  <transitions
+      source="//@nodes.0/@Children.0/@Children.2"
+      target="//@nodes.0/@Children.0/@Children.7"/>
+  <transitions
+      TE="proposal accepted"
+      source="//@nodes.0/@Children.0/@Children.7"
+      target="//@nodes.0/@Children.0/@Children.4"/>
+  <transitions
+      TE="proposal refused"
+      source="//@nodes.0/@Children.0/@Children.7"
+      target="//@nodes.0/@Children.0/@Children.8"/>
+  <transitions
+      TE="other shop exits/select shop"
+      source="//@nodes.0/@Children.0/@Children.8"
+      target="//@nodes.0/@Children.0/@Children.1"/>
+  <transitions
+      TE="continue/select shop"
+      source="//@nodes.0/@Children.0/@Children.6"
+      target="//@nodes.0/@Children.0/@Children.1"/>
+  <transitions
+      TE="stop shopping/exit mall"
+      source="//@nodes.0/@Children.0/@Children.6"
+      target="//@nodes.0/@Children.0/@Children.9"/>
+  <transitions
+      TE="no other shop"
+      source="//@nodes.0/@Children.0/@Children.8"
+      target="//@nodes.0/@Children.0/@Children.6"/>
+  <transitions
+      TE="mall exited"
+      source="//@nodes.0/@Children.0"
+      target="//@nodes.0/@Children.2"/>
+</statechart:Model>

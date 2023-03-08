@@ -1,0 +1,4 @@
+import statechart;
+
+String packagePath( Model e ) :
+   JAVA aseme.PackageHelper.packagePath(statechart.Model);

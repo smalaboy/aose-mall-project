@@ -1,0 +1,22 @@
+«IMPORT statechart»
+
+
+
+«EXTENSION aseme::nodeHelper2»
+
+«DEFINE model FOR statechart::Model»
+	«FILE  name+".nlogo"»
+	«EXPAND noeud FOREACH tree2list(this.nodes.first(), transitions)»
+	«ENDFILE»
+«ENDDEFINE»
+«DEFINE noeud FOR statechart::Node»
+	«IF type.compareTo("CONDITION")==0»
+	«ELSEIF type.compareTo("START")==0»
+	«ELSE»
+to «name» :
+«nodeToCode(this)»
+end
+	«ENDIF»
+
+«ENDDEFINE»
+

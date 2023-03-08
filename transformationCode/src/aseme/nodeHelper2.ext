@@ -1,0 +1,14 @@
+import statechart;
+
+
+String timestamp() :
+	JAVA aseme.NodeHelper2.timestamp();
+String className(Node e):
+	JAVA aseme.NodeHelper2.className(statechart.Node);
+ List[statechart::Node] tree2list(Node node, List l) :
+   JAVA aseme.NodeHelper2.tree2list(statechart.Node, java.util.List);
+   
+//String checkTransitionFor(Transition transition, Node node) : 
+//	JAVA aseme.NodeHelper2.checkTransitionFor(statechart.Transition, statechart.Node);
+String nodeToCode(Node e) : 
+	JAVA aseme.NodeHelper2.nodeToCode(statechart.Node);
