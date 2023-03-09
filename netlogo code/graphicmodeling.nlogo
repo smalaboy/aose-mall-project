@@ -49,20 +49,20 @@ to setup
       set color green
       set gender "women"
      ;setxy one-of [pxcor] of patches with [pcolor = black] one-of [pycor] of patches with [pcolor = black]
-      setxy -20 one-of [1 0 -1]
+      setxy -30 one-of [1 0 -1]
   ]
 
    ; yellow : supermarkets,  orange : restaurant,  magenta : clothes,  blue : hardware & electronic store   pink : hairdresser
-  ask n-of number-supermarket patches with [ all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 ) and (pxcor > -20 and pxcor < 20 )  ] [ set pcolor yellow ask neighbors [set pcolor yellow]  ]
-  ask n-of number-restaurant patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 ) and (pxcor > -20 and pxcor < 20 ) ] [    set pcolor orange ask neighbors [set pcolor orange] ]
-  ask n-of number-clothes patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 )and (pxcor > -20 and pxcor < 20 )] [    set pcolor magenta  ask neighbors [set pcolor magenta] ]
-  ask n-of number-Hardware-store patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 )and (pxcor > -20 and pxcor < 20 )] [    set pcolor blue ask neighbors [set pcolor blue] ]
-  ask n-of number-hairdresser patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -6 or pycor = 6 )and (pxcor > -20 and pxcor < 20 )] [    set pcolor pink ask neighbors [set pcolor pink]  ]
+  ask n-of number-supermarket patches with [ all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -10 or pycor = 10 ) and (pxcor > -30 and pxcor < 30 )  ] [ set pcolor yellow ask neighbors [set pcolor yellow ask neighbors [set pcolor yellow ask neighbors [set pcolor yellow ask neighbors [set pcolor yellow ask neighbors with [pcolor = black][set pcolor red ]] ] ] ]  ]
+  ask n-of number-restaurant patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -10 or pycor = 10 ) and (pxcor > -30 and pxcor < 30 ) ] [    set pcolor orange ask neighbors [set pcolor orange ask neighbors [set pcolor orange ask neighbors [set pcolor orange ask neighbors [set pcolor orange ask neighbors with [pcolor = black][set pcolor red ] ] ] ] ] ]
+  ask n-of number-clothes patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -10 or pycor = 10 )and (pxcor > -30 and pxcor < 30 )] [    set pcolor magenta  ask neighbors [set pcolor magenta ask neighbors [set pcolor magenta ask neighbors [set pcolor magenta ask neighbors [set pcolor magenta ask neighbors with [pcolor = black][set pcolor red ]]]]] ]
+  ask n-of number-Hardware-store patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -10 or pycor = 10 )and (pxcor > -30 and pxcor < 30 )] [    set pcolor blue ask neighbors [set pcolor blue ask neighbors [set pcolor blue ask neighbors [set pcolor blue ask neighbors [set pcolor blue ask neighbors with [pcolor = black][set pcolor red ]]]]] ]
+  ask n-of number-hairdresser patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -10 or pycor = 10 )and (pxcor > -30 and pxcor < 30 )] [    set pcolor pink ask neighbors [set pcolor pink ask neighbors [set pcolor pink ask neighbors [set pcolor pink ask neighbors [set pcolor pink ask neighbors with [pcolor = black][set pcolor red ] ]]]]  ]
   init-income
   ;draw the entrance
-  ask patches with [pxcor = -20 and pycor = 1  ] [set pcolor red]
-  ask patches with [pxcor = -20 and pycor = 0  ] [set pcolor red]
-  ask patches with [pxcor = -20 and pycor = -1  ] [set pcolor red]
+  ask patches with [pxcor = -35 and pycor = 1  ] [set pcolor red]
+  ask patches with [pxcor = -35 and pycor = 0  ] [set pcolor red]
+  ask patches with [pxcor = -35 and pycor = -1  ] [set pcolor red]
 
 END
 
@@ -301,7 +301,7 @@ end
 GRAPHICS-WINDOW
 210
 10
-751
+1141
 448
 -1
 -1
@@ -315,8 +315,8 @@ GRAPHICS-WINDOW
 1
 1
 1
--20
-20
+-35
+35
 -16
 16
 0
@@ -351,7 +351,7 @@ number-supermarket
 number-supermarket
 0
 100
-5.0
+1.0
 1
 1
 NIL
@@ -366,7 +366,7 @@ number-hairdresser
 number-hairdresser
 0
 50
-4.0
+1.0
 1
 1
 NIL
@@ -381,7 +381,7 @@ number-Hardware-store
 number-Hardware-store
 0
 50
-3.0
+1.0
 1
 1
 NIL
@@ -396,7 +396,7 @@ number-clothes
 number-clothes
 0
 50
-5.0
+1.0
 1
 1
 NIL
@@ -411,7 +411,7 @@ number-restaurant
 number-restaurant
 0
 50
-7.0
+1.0
 1
 1
 NIL
