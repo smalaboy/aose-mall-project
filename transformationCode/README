@@ -1,3 +1,5 @@
 1. Create a new xPand project
 2. Copy past src
-3. run workflow2.mwe2 on Model.xmi
+3. change in workflow2.mwe2 file 
+var modelUri  = "platform:/resource/YOURFOLDER/src/Model.xmi"
+4. run workflow2.mwe2 on Model.xmi
