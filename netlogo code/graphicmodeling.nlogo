@@ -2,8 +2,8 @@ breed [Workers worker]
 breed [Non-workers Non_worker]
 breed [assistants assistant]
 
-Workers-own [gender income]
-Non-workers-own [gender income]
+Workers-own [gender income cormarket corhairdresser corclothes correrstaurant corhardware]
+Non-workers-own [gender income cormarket corhairdresser corclothes correrstaurant corhardware]
 
 globals [
 
@@ -12,6 +12,20 @@ globals [
 
 to setup
   clear-all
+  let total-store number-supermarket + number-restaurant + number-clothes + number-Hardware-store + number-hairdresser
+  let x total-store * 5 + 1
+  resize-world -1 * x x -16 16
+
+  let mylist []
+  let  i -1 * x + 6
+  show i
+  while [i < x] [
+  set mylist lput i mylist
+  set i i + 10
+]
+
+
+
   ask patches [ setup-mall  ]
 
   ; create the mall
@@ -24,6 +38,7 @@ to setup
       set gender "men"
       set hidden? not hidden?
       setxy -20 one-of [1 0 -1]
+
 
   ]
  create-Workers 325 [
@@ -53,16 +68,20 @@ to setup
   ]
 
    ; yellow : supermarkets,  orange : restaurant,  magenta : clothes,  blue : hardware & electronic store   pink : hairdresser
-  ask n-of number-supermarket patches with [ all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -10 or pycor = 10 ) and (pxcor > -30 and pxcor < 30 )  ] [ set pcolor yellow ask neighbors [set pcolor yellow ask neighbors [set pcolor yellow ask neighbors [set pcolor yellow ask neighbors [set pcolor yellow ask neighbors with [pcolor = black][set pcolor red ]] ] ] ]  ]
-  ask n-of number-restaurant patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -10 or pycor = 10 ) and (pxcor > -30 and pxcor < 30 ) ] [    set pcolor orange ask neighbors [set pcolor orange ask neighbors [set pcolor orange ask neighbors [set pcolor orange ask neighbors [set pcolor orange ask neighbors with [pcolor = black][set pcolor red ] ] ] ] ] ]
-  ask n-of number-clothes patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -10 or pycor = 10 )and (pxcor > -30 and pxcor < 30 )] [    set pcolor magenta  ask neighbors [set pcolor magenta ask neighbors [set pcolor magenta ask neighbors [set pcolor magenta ask neighbors [set pcolor magenta ask neighbors with [pcolor = black][set pcolor red ]]]]] ]
-  ask n-of number-Hardware-store patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -10 or pycor = 10 )and (pxcor > -30 and pxcor < 30 )] [    set pcolor blue ask neighbors [set pcolor blue ask neighbors [set pcolor blue ask neighbors [set pcolor blue ask neighbors [set pcolor blue ask neighbors with [pcolor = black][set pcolor red ]]]]] ]
-  ask n-of number-hairdresser patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -10 or pycor = 10 )and (pxcor > -30 and pxcor < 30 )] [    set pcolor pink ask neighbors [set pcolor pink ask neighbors [set pcolor pink ask neighbors [set pcolor pink ask neighbors [set pcolor pink ask neighbors with [pcolor = black][set pcolor red ] ]]]]  ]
+  ask n-of number-supermarket patches with [ all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -10 or pycor = 10 ) and (member? pxcor mylist )  ] [ set pcolor yellow ask neighbors [set pcolor yellow ask neighbors [set pcolor yellow ask neighbors [set pcolor yellow ask neighbors [set pcolor yellow ask neighbors with [pcolor = black][set pcolor red ] ask neighbors with [member? pxcor mylist and (pycor = -5 or pycor = 5 ) ][set pcolor yellow ]] ] ] ]  ]
+  ask n-of number-restaurant patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -10 or pycor = 10 ) and (member? pxcor mylist ) ] [    set pcolor orange ask neighbors [set pcolor orange ask neighbors [set pcolor orange ask neighbors [set pcolor orange ask neighbors [set pcolor orange ask neighbors with [pcolor = black][set pcolor red ] ask neighbors with [member? pxcor mylist and (pycor = -5 or pycor = 5 ) ][set pcolor orange ] ] ] ] ] ]
+  ask n-of number-clothes patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -10 or pycor = 10 )and(member? pxcor mylist )] [    set pcolor magenta  ask neighbors [set pcolor magenta ask neighbors [set pcolor magenta ask neighbors [set pcolor magenta ask neighbors [set pcolor magenta ask neighbors with [pcolor = black][set pcolor red ] ask neighbors with [member? pxcor mylist and (pycor = -5 or pycor = 5 ) ][set pcolor magenta ]]]]] ]
+  ask n-of number-Hardware-store patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -10 or pycor = 10 )and (member? pxcor mylist )] [    set pcolor blue ask neighbors [set pcolor blue ask neighbors [set pcolor blue ask neighbors [set pcolor blue ask neighbors [set pcolor blue ask neighbors with [pcolor = black][set pcolor red ] ask neighbors with [member? pxcor mylist and (pycor = -5 or pycor = 5 ) ][set pcolor blue ]]]]] ]
+  ask n-of number-hairdresser patches with [all? neighbors [ pcolor = black ] and pcolor = Black and (pycor = -10 or pycor = 10 )and (member? pxcor mylist )] [    set pcolor pink ask neighbors [set pcolor pink ask neighbors [set pcolor pink ask neighbors [set pcolor pink ask neighbors [set pcolor pink ask neighbors with [pcolor = black][set pcolor red ] ask neighbors with [member? pxcor mylist and (pycor = -5 or pycor = 5 ) ][set pcolor pink ] ]]]]  ]
+
   init-income
+  init-store-cor
   ;draw the entrance
-  ask patches with [pxcor = -35 and pycor = 1  ] [set pcolor red]
-  ask patches with [pxcor = -35 and pycor = 0  ] [set pcolor red]
-  ask patches with [pxcor = -35 and pycor = -1  ] [set pcolor red]
+  ask patches with [pxcor = -1 * x and pycor = 1  ] [set pcolor red]
+  ask patches with [pxcor = -1 * x and pycor = 0  ] [set pcolor red]
+  ask patches with [pxcor = -1 * x and pycor = -1  ] [set pcolor red]
+  let p one-of patches with [pcolor = yellow and (pycor = -5 or pycor = 5 )]
+
 
 END
 
@@ -82,6 +101,40 @@ to setup-mall
 
 
 end
+
+
+to init-store-cor
+  ask Workers [
+  let m one-of patches with [pcolor = yellow and (pycor = -5 or pycor = 5 )]
+  let r one-of patches with [pcolor = orange and (pycor = -5 or pycor = 5 )]
+  let c one-of patches with [pcolor = magenta and (pycor = -5 or pycor = 5 )]
+  let he one-of patches with [pcolor = blue and (pycor = -5 or pycor = 5 )]
+  let h one-of patches with [pcolor = pink and (pycor = -5 or pycor = 5 )]
+  set cormarket m
+  set corhairdresser h
+  set corhardware he
+  set corclothes c
+  set correrstaurant r
+
+  ]
+  ask Non-Workers[
+  let m one-of patches with [pcolor = yellow and (pycor = -5 or pycor = 5 )]
+  let r one-of patches with [pcolor = orange and (pycor = -5 or pycor = 5 )]
+  let c one-of patches with [pcolor = magenta and (pycor = -5 or pycor = 5 )]
+  let he one-of patches with [pcolor = blue and (pycor = -5 or pycor = 5 )]
+  let h one-of patches with [pcolor = pink and (pycor = -5 or pycor = 5 )]
+  set cormarket m
+  set corhairdresser h
+  set corhardware he
+  set corclothes c
+  set correrstaurant r
+  ]
+
+
+
+end
+
+
 to init-income
 
   ask Workers [
@@ -301,7 +354,7 @@ end
 GRAPHICS-WINDOW
 210
 10
-1141
+1167
 448
 -1
 -1
@@ -315,8 +368,8 @@ GRAPHICS-WINDOW
 1
 1
 1
--35
-35
+-36
+36
 -16
 16
 0
@@ -351,7 +404,7 @@ number-supermarket
 number-supermarket
 0
 100
-1.0
+3.0
 1
 1
 NIL
