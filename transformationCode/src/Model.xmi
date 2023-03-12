@@ -62,7 +62,7 @@
       source="//@nodes.0/@Children.0/@Children.1"
       target="//@nodes.0/@Children.0/@Children.3"/>
   <transitions
-      TE="with assistance / receive proposal"
+      TE="with assistance/receive proposal"
       name="t_with_assistance"
       source="//@nodes.0/@Children.0/@Children.3"
       target="//@nodes.0/@Children.0/@Children.2"/>

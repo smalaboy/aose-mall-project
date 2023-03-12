@@ -7,6 +7,7 @@
 «DEFINE model FOR statechart::Model»
 	«FILE  name+".nlogo"»
 	«EXPAND noeud FOREACH tree2list(this.nodes.first(), transitions)»
+«getActions()»
 	«ENDFILE»
 «ENDDEFINE»
 «DEFINE noeud FOR statechart::Node»

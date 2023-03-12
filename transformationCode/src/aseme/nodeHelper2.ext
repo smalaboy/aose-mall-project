@@ -3,8 +3,8 @@ import statechart;
 
 String timestamp() :
 	JAVA aseme.NodeHelper2.timestamp();
-String className(Node e):
-	JAVA aseme.NodeHelper2.className(statechart.Node);
+String getActions():
+	JAVA aseme.NodeHelper2.getActions();
  List[statechart::Node] tree2list(Node node, List l) :
    JAVA aseme.NodeHelper2.tree2list(statechart.Node, java.util.List);
    

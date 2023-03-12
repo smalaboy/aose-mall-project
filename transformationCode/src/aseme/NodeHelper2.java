@@ -29,6 +29,8 @@ public class NodeHelper2 {
 	public static  ArrayList<Node> p = new ArrayList<Node>();
 	public static  ArrayList<Node> nodeStateList = new ArrayList<Node>();
 	public static  Map<Node,NodeStore> adjacencyList = new HashMap<Node,NodeStore>();
+	public static  ArrayList<String> actionsList = new ArrayList<String>();
+
 	/*
 	 * {Node : {"adjacentSibling":ArrayList<Node>,
 	 * 			"count" : int,
@@ -38,9 +40,14 @@ public class NodeHelper2 {
 		 public static String timestamp() {
 			 return String.valueOf( System.currentTimeMillis() );
 		 }
-		 public static String className( Node e ) {
-			 //return e.getName()+"Implementation";
-			 return "NONONO";
+		 public String getActions() {
+			 String returnMessage="";
+			 for (int i =0 ; i<actionsList.size();i++) {
+				 returnMessage += "to ";
+				 returnMessage += actionsList.get(i)+" :"+"\n";
+				 returnMessage  += "end"+"\n";
+			 }
+			 return returnMessage;
 		}
 		public List<Node> tree2list(Node h, List<Transition> l){
 			if (!p.isEmpty()){
@@ -88,7 +95,8 @@ public class NodeHelper2 {
 			for(int i =0 ; i < p.size();i++) {
 				//Init Adjancency List
 				Node iter = p.get(i);
-
+				String iterName = iter.getName().replaceAll(" ", "_");
+				iter.setName(iterName);
 				adjacencyList.put(iter, new NodeStore());
 				if(nodeStateType(iter)) {// node is a node state type
 					if(iter.getType().compareTo("OR")==0) {
@@ -105,6 +113,11 @@ public class NodeHelper2 {
 			Transition iter ;
 			for (int j=0 ; j< l.size(); j++) {//Pour toutes transitions
 				iter = l.get(j);
+				if(iter.getTE()!=null) {
+					String iterName = iter.getTE().replaceAll(" ", "_");
+					iter.setTE(iterName);
+				}
+
 				if(adjacencyList.containsKey(iter.getSource())) {//adding edge
 					//start go to edge -> go directly to start
 					if(iter.getSource().getType().compareTo("START")==0) {
@@ -159,7 +172,7 @@ public class NodeHelper2 {
 	        		Iterator<Transition> t = adjacencyList.get(iter).getTransitions().listIterator();
 	        		if(iter.getType().compareTo("OR")==0 && iter.getFather()==null) {//
 	        			for(int z =0 ; z<nodeStateList.size();z++) {
-		        			returnMessage+= "\t".repeat(level)+"if etat == \""+nodeStateList.get(z).getName()+"\""+"\n";
+		        			returnMessage+= "\t".repeat(level)+"if etat = \""+nodeStateList.get(z).getName()+"\""+"\n";
 		        			returnMessage+= "\t"+"\t".repeat(level)+nodeStateList.get(z).getName()+"\n";
 	        			}
 	        		}
@@ -169,7 +182,7 @@ public class NodeHelper2 {
 	        			if (!visited.containsKey(nodeI)) {//NOEUD NON VISITE => Creer du code netlogo
 
 	        				if(testType(nodeI)) {//Noeud non condition
-		        				returnMessage+= "\t".repeat(level)+"if "+transitionT.getTE()+"\n";
+		        				returnMessage+= "\t".repeat(level)+"if "+transformAction(transitionT.getTE(),level)+"\n";
 		        				returnMessage+= "\t"+"\t".repeat(level)+"set etat "+"\""+transitionT.getTarget().getName()+"\""+"\n";
 	        					visited.put(nodeI, true);
 
@@ -179,7 +192,7 @@ public class NodeHelper2 {
 	        						level--;
 	        					}
 	        					else {
-		        					returnMessage+= "\t".repeat(level)+"if "+transitionT.getTE()+"\n";
+		        					returnMessage+= "\t".repeat(level)+"if "+transformAction(transitionT.getTE(),level)+"\n";
 	        					}
 	        					//returnMessage+= "\t"+"\t".repeat(level)+transitionT.getTarget().getName()+"\n";
 	        					visited.put(nodeI, true);
@@ -221,7 +234,28 @@ public class NodeHelper2 {
 			}
 			return "";
 		}*/
-		
+		// split TE expressionto get condition and action call
+		public String transformAction(String s,int level) {
+			if(s==null) {
+				return "";
+			}
+			String[] teSplit = s.split("/");
+			if(teSplit.length==2) {
+				String transition = teSplit[0];
+				String action = teSplit[1];
+				actionsList.add(action.strip());
+				String messageReturn  = transition+"\n";
+				messageReturn += "\t"+"\t".repeat(level)+action;
+				return messageReturn;
+			}
+			else if(teSplit.length==1) {
+				return s;
+			}
+			else {
+				System.out.println("split by /  give 2+ part");
+				return "";
+			}
+		}
 		public boolean testType(Node n ) {
 			ArrayList<String> rejectedType= new ArrayList<String>();
 			rejectedType.add("CONDITION");
