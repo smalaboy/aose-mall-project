@@ -1,3 +1,4 @@
+The project generate netlogo code from a statechart model.
 1. Create a new xPand project
 2. Copy past src
 3. change in workflow2.mwe2 file 
