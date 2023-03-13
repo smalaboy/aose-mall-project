@@ -1,6 +1,7 @@
 The project generate netlogo code from a statechart model.
 1. Create a new xPand project
-2. Copy past src
+2. Copy past src and META-INF
 3. change in workflow2.mwe2 file 
 var modelUri  = "platform:/resource/YOURFOLDER/src/Model.xmi"
-4. run workflow2.mwe2 on Model.xmi
+4. change meta-inf file according to your new project
+5. run workflow2.mwe2 on Model.xmi
