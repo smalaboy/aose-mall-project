@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<statechart:Model xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:statechart="http://statechart/1.0" xsi:schemaLocation="http://statechart/1.0 metamodel/statechart.ecore" name="alaide" description="rien">
-  <nodes name="oui" label="test" type=" " activity="Auc" actions="Aucune" metadata="nonaz"/>
-  <nodes name="jreoiajaroz" label="jroizajraioj" activity="ijroajrioz" actions="razrza" metadata="oijroijoi"/>
-</statechart:Model>
