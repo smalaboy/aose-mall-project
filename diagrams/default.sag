@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SAG:SAGmodel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:SAG="http://www.amcl.tuc.gr/aseme/metamodels/SAG">
+  <goals name="Propose goods" depender="//@actors.0" dependee="//@actors.1"/>
+  <goals name="Checkout" depender="//@actors.2" dependee="//@actors.1"/>
+  <goals name="Purchase goods" depender="//@actors.1"/>
+  <actors my_goal="//@goals.0" name="Assistant"/>
+  <actors my_goal="//@goals.2" name="Citizen"/>
+  <actors my_goal="//@goals.1" name="Cashier"/>
+</SAG:SAGmodel>

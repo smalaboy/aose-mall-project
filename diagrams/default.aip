@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AIP:AIPmodel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:AIP="http://www.acml.tuc.gr/aseme/metamodels/AIP">
+  <participants name="Propose goods_Assistant" outcomes="has assisted a customer" liveness="propose offer.receive response"/>
+  <participants name="Propose goods_Citizen" engaging_rules="gets in a shop with assistance" outcomes="Accept or refuse an offer" liveness="receive proposal.evaluate proposal.sendResponse"/>
+  <participants name="Checkout_Cashier" outcomes="Has cashed the money" liveness="Receive Items.Enter Prices.Compute Total.Inform Customer.Cash Money"/>
+  <participants name="Checkout_Citizen" engaging_rules="gets to the checkout place" outcomes="Has paid for goods" liveness="Present Items.Receive Total. Pay"/>
+  <protocols participants="//@participants.0 //@participants.1" name="Propose goods"/>
+  <protocols participants="//@participants.2 //@participants.3" name="Checkout"/>
+</AIP:AIPmodel>

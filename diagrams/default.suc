@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SUC:SUCmodel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:SUC="http://www.amcl.tuc.gr/aseme/metamodels/SUC">
+  <roles participates_in="//@usecases.0" name="Assistant"/>
+  <roles participates_in="//@usecases.0 //@usecases.1 //@usecases.2" name="Citizen"/>
+  <roles participates_in="//@usecases.1" name="Cashier"/>
+  <usecases participant="//@roles.0 //@roles.1" name="Propose goods"/>
+  <usecases participant="//@roles.2 //@roles.1" name="Checkout"/>
+  <usecases participant="//@roles.1" name="Purchase goods"/>
+</SUC:SUCmodel>

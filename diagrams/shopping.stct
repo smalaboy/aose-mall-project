@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statechart:Model xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:statechart="http://statechart/1.0">
+  <nodes name="Citizen" type="OR">
+    <Children type="START"/>
+    <Children name="in_mall" type="OR">
+      <Children type="START"/>
+      <Children name="selecting_destination" type="BASIC"/>
+      <Children name="walking_in_mall" type="BASIC"/>
+      <Children type="CONDITION"/>
+      <Children name="waiting service" type="BASIC"/>
+      <Children name="exiting mall" type="BASIC"/>
+      <Children name="executing_service" type="BASIC"/>
+      <Children name="waiting_for_checkout" type="BASIC"/>
+      <Children type="CONDITION"/>
+      <Children name="checking_out" type="BASIC"/>
+      <Children type="END"/>
+    </Children>
+    <Children type="END"/>
+  </nodes>
+  <transitions TE="getCurrentTime() = time_to_go/teleport(entrance)" source="//@nodes.0/@Children.0" target="//@nodes.0/@Children.1"/>
+  <transitions source="//@nodes.0/@Children.1/@Children.0" target="//@nodes.0/@Children.1/@Children.1"/>
+  <transitions source="//@nodes.0/@Children.1/@Children.2" target="//@nodes.0/@Children.1/@Children.3"/>
+  <transitions TE="(arrived_in_shop) and (shop open)" source="//@nodes.0/@Children.1/@Children.3" target="//@nodes.0/@Children.1/@Children.4"/>
+  <transitions TE="task_done" source="//@nodes.0/@Children.1/@Children.6" target="//@nodes.0/@Children.1/@Children.8"/>
+  <transitions TE="rejected_proposal" source="//@nodes.0/@Children.1/@Children.8" target="//@nodes.0/@Children.1/@Children.1"/>
+  <transitions TE="accepted_proposal" source="//@nodes.0/@Children.1/@Children.8" target="//@nodes.0/@Children.1/@Children.7"/>
+  <transitions TE="(next_in_line) and (checkout_available)/setCheckoutDuration()" source="//@nodes.0/@Children.1/@Children.7" target="//@nodes.0/@Children.1/@Children.9"/>
+  <transitions TE="true/exit()" source="//@nodes.0/@Children.1/@Children.5" target="//@nodes.0/@Children.1/@Children.10"/>
+  <transitions source="//@nodes.0/@Children.1" target="//@nodes.0/@Children.2"/>
+  <transitions TE="checkout_done/updateNeededTasks()" source="//@nodes.0/@Children.1/@Children.9" target="//@nodes.0/@Children.1/@Children.1"/>
+  <transitions TE="(nothing_to_do) and (at_exit)" source="//@nodes.0/@Children.1/@Children.3" target="//@nodes.0/@Children.1/@Children.5"/>
+  <transitions TE="(next_in_line) and (service_available)/setTaskDuration()" source="//@nodes.0/@Children.1/@Children.4" target="//@nodes.0/@Children.1/@Children.6"/>
+  <transitions TE="true/setDestination()" source="//@nodes.0/@Children.1/@Children.1" target="//@nodes.0/@Children.1/@Children.2"/>
+  <transitions TE="shop_closed" source="//@nodes.0/@Children.1/@Children.3" target="//@nodes.0/@Children.1/@Children.1"/>
+</statechart:Model>

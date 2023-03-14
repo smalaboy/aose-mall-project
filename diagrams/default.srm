@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SRM:SRMmodel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:SRM="http://www.amcl.tuc.gr/aseme/metamodels/SRM">
+  <activities name="Proposegoods" functionality="//@functionalities.0"/>
+  <activities name="proposeoffer" functionality="//@functionalities.1"/>
+  <activities name="receiveresponse" functionality="//@functionalities.2"/>
+  <activities name="receiveproposal" functionality="//@functionalities.3"/>
+  <activities name="evaluateproposal" functionality="//@functionalities.4"/>
+  <activities name="sendResponse" functionality="//@functionalities.5"/>
+  <activities name="Checkout" functionality="//@functionalities.6"/>
+  <activities name="ReceiveItems" functionality="//@functionalities.7"/>
+  <activities name="EnterPrices" functionality="//@functionalities.8"/>
+  <activities name="ComputeTotal" functionality="//@functionalities.9"/>
+  <activities name="InformCustomer" functionality="//@functionalities.10"/>
+  <activities name="CashMoney" functionality="//@functionalities.11"/>
+  <activities name="PresentItems" functionality="//@functionalities.12"/>
+  <activities name="ReceiveTotal" functionality="//@functionalities.13"/>
+  <activities name="Pay" functionality="//@functionalities.14"/>
+  <capabilities name="Propose goods_Assistant" capability_activities="//@activities.0 //@activities.1 //@activities.2" description="Propose goods = propose offer.receive response"/>
+  <capabilities name="Propose goods_Citizen" capability_activities="//@activities.0 //@activities.3 //@activities.4 //@activities.5" description="Propose goods = receive proposal.evaluate proposal.sendResponse"/>
+  <capabilities name="Checkout_Cashier" capability_activities="//@activities.6 //@activities.7 //@activities.8 //@activities.9 //@activities.10 //@activities.11" description="Checkout = Receive Items.Enter Prices.Compute Total.Inform Customer.Cash Money"/>
+  <capabilities name="Checkout_Citizen" capability_activities="//@activities.6 //@activities.12 //@activities.13 //@activities.14" description="Checkout = Present Items.Receive Total. Pay"/>
+  <functionalities activities="//@activities.0"/>
+  <functionalities activities="//@activities.1"/>
+  <functionalities activities="//@activities.2"/>
+  <functionalities activities="//@activities.3"/>
+  <functionalities activities="//@activities.4"/>
+  <functionalities activities="//@activities.5"/>
+  <functionalities activities="//@activities.6"/>
+  <functionalities activities="//@activities.7"/>
+  <functionalities activities="//@activities.8"/>
+  <functionalities activities="//@activities.9"/>
+  <functionalities activities="//@activities.10"/>
+  <functionalities activities="//@activities.11"/>
+  <functionalities activities="//@activities.12"/>
+  <functionalities activities="//@activities.13"/>
+  <functionalities activities="//@activities.14"/>
+</SRM:SRMmodel>

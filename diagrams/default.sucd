@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:SUC="http://www.amcl.tuc.gr/aseme/metamodels/SUC" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_DYqVILhvEe2CgecEqp5gqQ" type="SUC" measurementUnit="Pixel">
+  <children xmi:type="notation:Node" xmi:id="_DZHBELhvEe2CgecEqp5gqQ" type="2002">
+    <children xmi:type="notation:DecorationNode" xmi:id="_DZHoILhvEe2CgecEqp5gqQ" type="5003"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_DZHBEbhvEe2CgecEqp5gqQ"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_DZHBErhvEe2CgecEqp5gqQ" fontName="Segoe UI"/>
+    <element xmi:type="SUC:UseCase" href="default.suc#//@usecases.0"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_DZHBE7hvEe2CgecEqp5gqQ" x="167" y="236" width="155" height="76"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_DZHoIbhvEe2CgecEqp5gqQ" type="2002">
+    <children xmi:type="notation:DecorationNode" xmi:id="_DZHoJbhvEe2CgecEqp5gqQ" type="5003"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_DZHoIrhvEe2CgecEqp5gqQ"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_DZHoI7hvEe2CgecEqp5gqQ" fontName="Segoe UI"/>
+    <element xmi:type="SUC:UseCase" href="default.suc#//@usecases.1"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_DZHoJLhvEe2CgecEqp5gqQ" x="573" y="234" width="101" height="76"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_DZHoJrhvEe2CgecEqp5gqQ" type="2002">
+    <children xmi:type="notation:DecorationNode" xmi:id="_DZHoKrhvEe2CgecEqp5gqQ" type="5003"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_DZHoJ7hvEe2CgecEqp5gqQ"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_DZHoKLhvEe2CgecEqp5gqQ" fontName="Segoe UI"/>
+    <element xmi:type="SUC:UseCase" href="default.suc#//@usecases.2"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_DZHoKbhvEe2CgecEqp5gqQ" x="363" y="236" width="141" height="76"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_DZIPMLhvEe2CgecEqp5gqQ" type="2001">
+    <children xmi:type="notation:DecorationNode" xmi:id="_DZIPNbhvEe2CgecEqp5gqQ" type="5001"/>
+    <children xmi:type="notation:DecorationNode" xmi:id="_DZIPNrhvEe2CgecEqp5gqQ" type="5004"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_DZIPMbhvEe2CgecEqp5gqQ"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_DZIPMrhvEe2CgecEqp5gqQ" fontName="Segoe UI"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_DZIPM7hvEe2CgecEqp5gqQ"/>
+    <element xmi:type="SUC:Role" href="default.suc#//@roles.0"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_DZIPNLhvEe2CgecEqp5gqQ" x="104" y="136" width="183" height="71"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_DZIPN7hvEe2CgecEqp5gqQ" type="2001">
+    <children xmi:type="notation:DecorationNode" xmi:id="_DZI2QLhvEe2CgecEqp5gqQ" type="5001"/>
+    <children xmi:type="notation:DecorationNode" xmi:id="_DZI2QbhvEe2CgecEqp5gqQ" type="5004"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_DZIPOLhvEe2CgecEqp5gqQ"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_DZIPObhvEe2CgecEqp5gqQ" fontName="Segoe UI"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_DZIPOrhvEe2CgecEqp5gqQ"/>
+    <element xmi:type="SUC:Role" href="default.suc#//@roles.1"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_DZIPO7hvEe2CgecEqp5gqQ" x="345" y="136" width="173" height="57"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_DZI2QrhvEe2CgecEqp5gqQ" type="2001">
+    <children xmi:type="notation:DecorationNode" xmi:id="_DZI2R7hvEe2CgecEqp5gqQ" type="5001"/>
+    <children xmi:type="notation:DecorationNode" xmi:id="_DZI2SLhvEe2CgecEqp5gqQ" type="5004"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_DZI2Q7hvEe2CgecEqp5gqQ"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_DZI2RLhvEe2CgecEqp5gqQ" fontName="Segoe UI"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_DZI2RbhvEe2CgecEqp5gqQ"/>
+    <element xmi:type="SUC:Role" href="default.suc#//@roles.2"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_DZI2RrhvEe2CgecEqp5gqQ" x="567" y="136" width="168" height="57"/>
+  </children>
+  <styles xmi:type="notation:DiagramStyle" xmi:id="_DYqVIbhvEe2CgecEqp5gqQ"/>
+  <element xmi:type="SUC:SUCmodel" href="default.suc#/"/>
+</notation:Diagram>
