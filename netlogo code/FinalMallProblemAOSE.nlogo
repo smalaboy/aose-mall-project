@@ -97,10 +97,11 @@ end
 to selectingDestination
   set targetedShop selectTask
 
-  if (targetedShop != -1) [
+  ifelse (targetedShop != -1) [
     setSpecificShopCoordinates targetedShop
     set state "walkingInMall"
   ]
+  [goTo list xcor 0]
 end
 
 to walkingInMall
@@ -564,7 +565,8 @@ to-report setTime
       foreach temp [
         x -> let closingTime (getClosingTime x - getApproxDuration (list x) - 30)
         let openingTime max list (getOpeningTime x) getCurrentTime
-        let temp2 (openingTime + (random (closingTime - openingTime)))
+        let temp2 openingTime
+        if(closingTime - openingTime) > 0 [set temp2 (openingTime + (random (closingTime - openingTime)))]
         if temp2 < minTime [
           set minTime temp2
         ]
@@ -610,6 +612,7 @@ to-report selectTask
   ]
   if (length temp = 0) and (letsWait = true) [
     if (breed = Workers and inDay != day) [ report -2]
+    if (breed = Non-workers) [report -2]
     report -1
   ]
   if (length temp = 0) and (letsWait = false) [
