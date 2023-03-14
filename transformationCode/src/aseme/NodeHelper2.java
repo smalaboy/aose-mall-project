@@ -8,6 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
@@ -44,7 +46,7 @@ public class NodeHelper2 {
 			 String returnMessage="";
 			 for (int i =0 ; i<actionsList.size();i++) {
 				 returnMessage += "to ";
-				 returnMessage += actionsList.get(i)+" :"+"\n";
+				 returnMessage += actionsList.get(i).replace("(", "[").replace(")", "]")+" :"+"\n";
 				 returnMessage  += "end"+"\n";
 			 }
 			 return returnMessage;
@@ -95,8 +97,8 @@ public class NodeHelper2 {
 			for(int i =0 ; i < p.size();i++) {
 				//Init Adjancency List
 				Node iter = p.get(i);
-				String iterName = iter.getName().replaceAll(" ", "_");
-				iter.setName(iterName);
+				//String iterName = iter.getName().replaceAll(" ", "_");
+				//iter.setName(iterName);
 				adjacencyList.put(iter, new NodeStore());
 				if(nodeStateType(iter)) {// node is a node state type
 					if(iter.getType().compareTo("OR")==0) {
@@ -115,7 +117,13 @@ public class NodeHelper2 {
 				iter = l.get(j);
 				if(iter.getTE()!=null) {
 					String iterName = iter.getTE().replaceAll(" ", "_");
+					//extract function in TE in condition and action
+					addFunction(iterName);
+					iterName = iterName.replace("(", " ");
+					iterName = iterName.replace(")", " ");
+
 					iter.setTE(iterName);
+					// add to action list if function in TE
 				}
 
 				if(adjacencyList.containsKey(iter.getSource())) {//adding edge
@@ -159,6 +167,8 @@ public class NodeHelper2 {
 	        visited.put(n, true);
 	        queue.add(n);
 	        int level = 1;
+			String retenue = "";
+
 	        while (queue.size() != 0) {
 	            // Dequeue a vertex from queue and print it
 	        	int level_size = queue.size();
@@ -172,18 +182,32 @@ public class NodeHelper2 {
 	        		Iterator<Transition> t = adjacencyList.get(iter).getTransitions().listIterator();
 	        		if(iter.getType().compareTo("OR")==0 && iter.getFather()==null) {//
 	        			for(int z =0 ; z<nodeStateList.size();z++) {
-		        			returnMessage+= "\t".repeat(level)+"if etat = \""+nodeStateList.get(z).getName()+"\""+"\n";
-		        			returnMessage+= "\t"+"\t".repeat(level)+nodeStateList.get(z).getName()+"\n";
+		        			returnMessage+= "\t".repeat(level)+"if etat = \""+nodeStateList.get(z).getName()+"\""+" ["+"\n";
+		        			returnMessage+= "\t"+"\t".repeat(level)+nodeStateList.get(z).getName()+"\n"+"]"+"\n";
 	        			}
 	        		}
+
 	        		while (i.hasNext()) {
+	        			
 	        			Node nodeI = i.next();
 	        			Transition transitionT = t.next(); 
 	        			if (!visited.containsKey(nodeI)) {//NOEUD NON VISITE => Creer du code netlogo
 
 	        				if(testType(nodeI)) {//Noeud non condition
-		        				returnMessage+= "\t".repeat(level)+"if "+transformAction(transitionT.getTE(),level)+"\n";
-		        				returnMessage+= "\t"+"\t".repeat(level)+"set etat "+"\""+transitionT.getTarget().getName()+"\""+"\n";
+	        					if(transitionT.getTE()==null) {
+	        						if(transitionT.getTarget().getType().compareTo("END")!=0) {
+				        				returnMessage+= "\t".repeat(level)+"set etat "+"\""+transitionT.getTarget().getName()+"\""+"\n";
+	        						}
+	        					}
+	        					else {
+			        				returnMessage+= "\t".repeat(level)+"if "+transformAction(transitionT.getTE(),level)+"\n";
+			        				returnMessage+= "\t"+"\t".repeat(level)+"set etat "+"\""+transitionT.getTarget().getName()+"\""+"\n"+"]"+retenue+"\n";
+			        				if(retenue.compareTo("")!=0) {
+				        				retenue = "";
+			        				}
+			        				
+	        					}
+
 	        					visited.put(nodeI, true);
 
 	        				}
@@ -193,6 +217,7 @@ public class NodeHelper2 {
 	        					}
 	        					else {
 		        					returnMessage+= "\t".repeat(level)+"if "+transformAction(transitionT.getTE(),level)+"\n";
+		        					retenue += "]";
 	        					}
 	        					//returnMessage+= "\t"+"\t".repeat(level)+transitionT.getTarget().getName()+"\n";
 	        					visited.put(nodeI, true);
@@ -243,13 +268,13 @@ public class NodeHelper2 {
 			if(teSplit.length==2) {
 				String transition = teSplit[0];
 				String action = teSplit[1];
-				actionsList.add(action.strip());
-				String messageReturn  = transition+"\n";
+				addActionsList(action.strip());
+				String messageReturn  = transition+" ["+"\n";
 				messageReturn += "\t"+"\t".repeat(level)+action;
 				return messageReturn;
 			}
 			else if(teSplit.length==1) {
-				return s;
+				return s+" [";
 			}
 			else {
 				System.out.println("split by /  give 2+ part");
@@ -278,5 +303,61 @@ public class NodeHelper2 {
 				}
 			}
 			return true;
+		}
+		public static String extractFunction(String input) {
+		    // Regular expression pattern to match a function call with optional arguments
+		    String functionCallPattern = "\\w+\\((\\w,?)*\\)";
+
+		    // Create a regular expression object
+		    Pattern pattern = Pattern.compile(functionCallPattern);
+
+		    // Use the regular expression object to search for a match in the input string
+		    Matcher matcher = pattern.matcher(input);
+
+		    // If a match was found, extract the function call string
+		    if (matcher.find()) {
+		        return matcher.group();
+		    }
+		    // If no match was found, return null
+		    return null;
+		}
+		public static void addActionsList(String s) {
+			int indexOpen = s.indexOf("(");
+			int indexEnd = s.indexOf(")");
+			if(indexEnd <0 || indexOpen <0) {
+				return ;
+			}
+			int diff = indexEnd-indexOpen;
+			String send = s;
+			if(diff==1) {//no arg
+				send = send.replace("(", " ").replace(")", " ").strip();
+
+			}
+			else {//arg
+				send = send.replace("(", " [").replace(")", "]").strip();
+			}
+			if(!actionsList.contains(send) && !send.contains("and")) {
+				actionsList.add(send);
+			}
+		}
+		public static void addFunction(String s) {
+			if(s!=null) {
+				String[] teSplit = s.split("/");
+				if(teSplit.length==2) {
+					String transition = teSplit[0];
+					String action = teSplit[1];
+					addActionsList(action.strip());
+					String functionFound = extractFunction(transition);
+					if(functionFound!=null) {
+						addActionsList(functionFound.strip());
+					}
+				}
+				else if(teSplit.length==1) {
+					String functionFound = extractFunction(s);
+					if(functionFound!=null) {
+						addActionsList(functionFound.strip());
+					}
+				}
+			}
 		}
 }

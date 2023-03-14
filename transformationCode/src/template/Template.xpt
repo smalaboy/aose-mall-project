@@ -12,7 +12,6 @@
 «ENDDEFINE»
 «DEFINE noeud FOR statechart::Node»
 	«IF type.compareTo("CONDITION")==0»
-	«ELSEIF type.compareTo("START")==0»
 	«ELSE»
 to «name» :
 «nodeToCode(this)»
