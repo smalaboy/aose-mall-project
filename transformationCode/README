@@ -5,3 +5,9 @@ The project generate netlogo code from a statechart model.
 var modelUri  = "platform:/resource/YOURFOLDER/src/Model.xmi"
 4. change meta-inf file according to your new project
 5. run workflow2.mwe2 on Model.xmi
+
+
+
+
+Problems : 
+- Don't forget to give name to model
