@@ -1,27 +1,88 @@
+extensions [csv]
 breed [Workers worker]
 breed [Non-workers Non_worker]
 breed [assistants assistant]
 
-Workers-own [gender income needs doneToday visitedShops timeToGo state targetedShop waitingTime taskDuration specificShop inDay]
-Non-workers-own [gender income needs timeToGo state targetedShop waitingTime taskDuration specificShop]
+Workers-own [gender income needs doneToday visitedShops timeToGo state targetedShop waitingTime taskDuration specificShop inDay myHistory]
+Non-workers-own [gender income needs timeToGo state targetedShop waitingTime taskDuration specificShop myHistory]
 patches-own [lineService lineCheckout nbAvailableService nbAvailableCheckout]
 
 globals [
-date day hour minute openedTime openedTimeNon durationMen durationWomen deviationMen deviationWomen checkoutAv deviationCheckout entranceMall
-  shopsInformations nbEmployees waitingTimes nbWaiting shopIncomes daysString
+  ;These variables represent the current time
+  date day hour minute
+
+  ;These variables contain the opening et closing hours of shops as specified in the subject
+  openedTime openedTimeNon
+
+  ;These variables contain the informations regarding the durations of the tasks as specified in the subject
+  durationMen durationWomen deviationMen deviationWomen checkoutAv deviationCheckout
+
+  ;This variable contains the coordinates of the mall entrance
+  entranceMall
+
+  ;This variable contains the coordinates of the different shops inside the mall as well as the number of employees allocated to each of them
+  shopsInformations
+
+ ;This variable contains the total number of employees allocated for each store type
+  nbEmployees
+
+  ;These variables contain the various informations for the waiting times of the agents in the shops and is used for the plot displayed
+  waitingTimes nbWaiting
+
+  ;This variable contains the accumulated income for each store type and is used for the plot displayed
+  shopIncomes
+
+  ;These variables are used for some of the displayers in the interface
+  daysString totalNumberofNeeds currentInMall
+
+  ;This variable contains the width of the mall
+  mallsize
 
 ]
 
 
+;This procedure is used at every time step (ticks) to update the various time variables
+to incTime
+  set minute (minute + 1)
+  if minute = 60 [
+    set minute 0
+    set hour hour + 1
+  ]
+  if hour = 24 [
+    set hour 0
+    set day day + 1
+    set date date + 1
+
+    if day = 7 [
+      set day 0
+    ]
+    ask turtles [
+      setNeeds
+      set timeToGo setTime
+      set myHistory lput [0 0 0 0 0] myHistory
+    ]
+  ]
+
+end
+
+
+
+
+
+;This is the procedure used to run the simulation, it is used at every tick.
 to go
   incTime
+  set currentInMall [0 0 0 0 0]
+  set totalNumberofNeeds [0 0 0 0 0]
   ask turtles [
     Citizen
+    setCurrentInMall
+    setTotalNeeds
   ]
   tick
 end
 
-
+;This is the procedure used by the agents at every time step, it calls another procedure for the agent depending on the agent's state
 to Citizen
   if getCurrentTime = timeToGo and state = "out" [
     goInMall
@@ -49,44 +110,7 @@ to Citizen
   ]
 end
 
-to teleport [destination]
-  set xcor item 0 destination
-  set ycor item 1 destination
-end
-
-to goTo [destination]
-  ifelse (xcor = item 0 destination and ycor = item 1 destination) [
-  ]
-  [
-    ifelse xcor != item 0 destination [
-      ifelse ycor != item 1 entranceMall [
-        ifelse ycor < item 1 entranceMall [
-          set ycor (ycor + 1)
-        ]
-        [
-          set ycor (ycor - 1)
-        ]
-      ]
-      [
-        ifelse xcor < item 0 destination [
-          set xcor (xcor + 1)
-        ]
-        [
-          set xcor (xcor - 1)
-        ]
-      ]
-    ]
-    [
-      ifelse ycor < item 1 destination [
-        set ycor (ycor + 1)
-      ]
-      [
-        set ycor (ycor - 1)
-      ]
-    ]
-  ]
-end
-
+;This the procedure to enter the mall, it is used by an agent when the time for him to go the mall arrived
 to goInMall
   teleport entranceMall
   if breed = Workers [set inDay day]
@@ -94,6 +118,8 @@ to goInMall
   set state "selectingDestination"
 end
 
+
+;This is the procedure used when an agent inside the mall is trying to determine what to do
 to selectingDestination
   set targetedShop selectTask
 
@@ -104,6 +130,8 @@ to selectingDestination
   [goTo list xcor 0]
 end
 
+
+;This is the procedure used when an agent is walking in the mall
 to walkingInMall
   let arrived false
   if ((xcor = item 0 specificShop) and (ycor = item 1 specificShop)) [set arrived true]
@@ -126,15 +154,19 @@ to walkingInMall
       set state "waitingForService"
     ]
     (openedShop = false and targetedShop >= 0) [
+
       set state "selectingDestination"
     ]
     [
-      goTo specificShop
       goTo specificShop
     ]
   )
 end
 
+
+
+
+;This is the procedure used when an agent has arrived in a shop and is waiting in line to be served
 to waitingForService
   let nextInLine false
   let serviceAvailable false
@@ -165,6 +197,8 @@ to waitingForService
   ]
 end
 
+
+;This is the procedure used when an agent is executing a task
 to executingService
   set waitingTime (waitingTime + 1)
   let serviceDone false
@@ -190,6 +224,8 @@ to executingService
   ]
 end
 
+
+;This is the procedure used when an agent has finished his task and his waiting in line to checkout
 to waitingForCheckout
   let nextInLine false
   let checkoutAvailable false
@@ -223,6 +259,10 @@ to waitingForCheckout
   ]
 end
 
+
+
+
+;This the procedure used to execute the checkout
 to checkingOut
   set waitingTime (waitingTime + 1)
   let checkingOutDone false
@@ -231,6 +271,7 @@ to checkingOut
 
   if checkingOutDone [
     set shopIncomes replace-item targetedShop shopIncomes ((item targetedShop shopIncomes) + (payPrice targetedShop))
+    set myhistory replace-item day myHistory (replace-item targetedShop (item day myHistory) ((item targetedShop (item day myHistory)) + (payPrice targetedShop)))
     if nbAvailableCheckout >= 0 [set nbAvailableCheckout (nbAvailableCheckout + 1)]
     set waitingTime 0
     set taskDuration -1
@@ -240,16 +281,22 @@ to checkingOut
   ]
 end
 
+
+;This is the procedure used when the agent is at the entrance of the mall and wants to exit it
 to exitingMall
   set state "out"
   resetExit
 end
 
+
+
+;This procedure is used to update some of the agents' attributes when exiting the mall
 to resetExit
   if breed = Workers [
     set doneToday (list)
     set visitedShops (list (list) (list))
     set inDay -1
+    set timeToGo setTime
   ]
   set targetedShop -3
   set specificShop (list)
@@ -259,26 +306,27 @@ to resetExit
 end
 
 
-to incTime
-  set minute (minute + 1)
-  if minute = 60 [
-    set minute 0
-    set hour hour + 1
-  ]
-  if hour = 24 [
-    set hour 0
-    set day day + 1
-    set date date + 1
-    ask turtles [
-      setNeeds
-      set timeToGo setTime
-    ]
-  ]
-  if day = 7 [
-    set day 0
+;This procedure transform the current day number to a string for the displayer in the interface
+to-report getDaysString
+  let temp ["Monday" "Tuesday" "Wednesday" "Thursday" "Friday" "Saturday" "Sunday"]
+  report (item day temp)
+end
+
+;This procedure update the total number of agents inside the mall for the displayer in the interface
+to setcurrentinMall
+  if (state != "out" and state != "selectingDestination" and state != "walkingInMall" and state != "exitingMall")[set currentInMall replace-item targetedShop currentInMall ((item targetedShop currentInMall) + 1)]
+end
+
+;This procedure update the total number of needs of the agents for each type of task for the displayers in the interface
+to setTotalNeeds
+  let counter 0
+  foreach needs [
+    set totalNumberofNeeds replace-item counter totalNumberofNeeds ((item counter totalNumberofNeeds) + (item counter needs))
+    set counter (counter + 1)
   ]
 end
 
+;This procedure randomly increments the number of times an agent currently has to do each type of task, it is used at the beginning of everyday
 to setNeeds
   if breed = Workers [
     if random 28 < 8 [set needs replace-item 0 needs (item 0 needs + 1)]
@@ -301,6 +349,338 @@ to setNeeds
   ]
 end
 
+
+;This procedure returns the time of the day at which an agent will go to the mall next time, it is randomly generated between the estimated earliest time and latest times an agent
+;has to go to the mall to be able to do all the task he needs to do without having to wait for the opening of the store to do a task(theoretically, as the task durations are random).
+;This procedure is used at the beginning of every day or, for non-worker agents, every time they exit the mall.
+;Extensive explanations about this procedure are provided in the integration part of the project report
+to-report setTime
+  ifelse state = "out"[
+    let temp (list)
+    let tempbis needs
+    if targetedShop > -1 [set tempbis replace-item targetedShop tempbis ((item targetedShop tempbis) - 1)]
+    let counter -1
+    foreach tempbis [
+      x -> set counter (counter + 1)
+      if x > 0 [set temp lput counter temp]
+    ]
+    if breed = Workers [
+      let minTime 0
+      let maxTime 1000000
+      if length temp = 1 [
+        report (getOpeningTime (item 0 temp) + (random (getClosingTime (item 0 temp) - getAvgDuration (list (item 0 temp)) - getOpeningTime (item 0 temp) - 2 * getAvgTravelTimeInMall)))
+      ]
+      if length temp > 1 [
+        let change  true
+        foreach temp [
+          x -> if getOpeningTime x > minTime [
+            set minTime getOpeningTime x
+          ]
+          let closingTime (getClosingTime x - getApproxDuration temp)
+          if closingTime < maxTime [
+            set maxTime closingTime
+          ]
+        ]
+        set change false
+        foreach temp [
+          x -> if getOpeningTime x < minTime [
+            ifelse getOpeningTime x < (minTime - getApproxDuration (list x)) [
+
+              set minTime (minTime - getApproxDuration (list x))
+              set change true
+            ]
+            [
+              set minTime getOpeningTime x
+              set change true
+            ]
+          ]
+          let closingTime (getClosingTime x - getApproxDuration temp)
+          if closingTime > maxTime [
+            ifelse closingTime > (maxTime + getApproxDuration (list x)) [
+              set maxTime (maxTime + getApproxDuration (list x))
+              set change true
+            ]
+            [
+              set maxTime closingTime
+              set change true
+            ]
+          ]
+        ]
+        set maxTime (maxTime - 2 * getAvgTravelTimeInMall)
+        set maxTime min list maxTime 1430
+        ifelse maxTime - minTime > 0 [
+          report (minTime + (random (maxTime - minTime)))
+        ]
+        [
+          report minTime
+        ]
+      ]
+      if length temp < 1 [
+        report -1
+      ]
+    ]
+
+    if breed = Non-workers [
+      foreach temp [
+        x -> if getCurrentTime > (getClosingTime x - getApproxDuration (list x) - getAvgTravelTimeInMall) [
+          set temp (remove x temp)
+        ]
+      ]
+      if length temp > 0 [
+        let minTime 50000
+        foreach temp [
+          x -> let closingTime (getClosingTime x - getApproxDuration (list x) - 2 * getAvgTravelTimeInMall)
+          let openingTime max list (getOpeningTime x) getCurrentTime
+          let temp2 openingTime
+          if(closingTime - openingTime) > 0 [set temp2 (openingTime + (random (closingTime - openingTime)))]
+          if temp2 < minTime [
+            set minTime temp2
+          ]
+        ]
+        report minTime
+      ]
+      if length temp = 0 [
+        report -1
+      ]
+    ]
+  ]
+  [
+    report timeToGo
+  ]
+end
+
+
+;This procedure is used by agents when inside the mall to select which task to do next, it can be doing a type of task, exiting the mall, or wait for a soon to be open shop.
+;This procedure will be used any time an agent enter the mall, exit a shop or need to reconsider his destination because his targeted shop closed.
+;Non-worker agents will randomly choose a task between the ones they need to do and can do at the current time, they will never wait for a shop to open,
+;if they can't currently do a task, they will leave the mall,
+;Workers will always prefer to do an available task rather than wait for a shop to be open. When choosing a task, workers will always choose the most urgent
+;task, that is the task with lowest value of closing time minus task duration.
+;Extensive explanations about this procedure are provided in the integration part of the project report
+to-report selectTask
+  if breed = Workers [if length doneToday > 2[report -2]]
+  let temp (list)
+  let letsWait false
+
+  if breed = Workers [
+    let countery -1
+    foreach needs [
+      x ->
+      set countery (countery + 1)
+      if (x > 0) and ((member? countery doneToday) = false) [set temp lput countery temp]
+    ]
+  ]
+  if breed = Non-workers [
+    let countery -1
+    foreach needs [
+      x -> set countery (countery + 1)
+      if (x > 0) [set temp lput countery temp]
+    ]
+  ]
+
+  foreach temp [
+    x ->
+    let modifCurrent getCurrentTime if (breed = Workers)[if day != inDay [set modifCurrent (modifCurrent + 60 * 24)]]
+    if modifCurrent > (getClosingTime x - getAvgDuration (list x) - getAvgTravelTimeInMall) [
+      set temp (remove x temp)
+    ]
+    let temporary getCurrentTime if (breed = Workers)[if day != inDay [set temporary (temporary + 60 * 24)]]
+    if temporary < getOpeningTime x [
+      set temp (remove x temp)
+      set letsWait true
+    ]
+  ]
+  if (length temp = 0) and (letsWait = true) [
+    if (breed = Workers and inDay != day) [ report -2]
+    if (breed = Non-workers) [report -2]
+    report -1
+  ]
+  if (length temp = 0) and (letsWait = false) [
+    report -2
+  ]
+  if breed = Workers [
+    set temp (shuffle temp)
+    let minTime 100000
+    let minShop -10
+    foreach temp [
+      x -> let temp2 (getClosingTime x - getAvgDuration (list x))
+      if temp2 < minTime [
+        set minTime temp2
+        set minShop x
+      ]
+    ]
+    report minShop
+  ]
+  if breed = Non-workers [
+    set temp (shuffle temp)
+    report (item 0 temp)
+  ]
+end
+
+;This procedure is used by agents after selecting a task to do determine which specific shop to go to.
+;The specific shop to go will be chosen randomly but with probabilities depending on the number of employees working in the shop, shops with more employees will
+;be chosen more often by the agents, shops with no employees will never be chosen
+to setSpecificShopCoordinates [shop]
+  if shop >= 0 [
+
+    let listShops (item shop shopsInformations)
+    let nbRemainingEmployees (item shop nbEmployees)
+    if breed = Workers and targetedShop > 2[
+      foreach listShops [
+        x -> foreach (item (targetedShop - 3) visitedShops) [
+          y -> if y = (item 0 x) [
+            set nbRemainingEmployees (nbRemainingEmployees - item 1 x)
+            set listShops remove x listShops
+          ]
+        ]
+      ]
+    ]
+    let inc 0
+    foreach listShops [
+      x -> set inc (inc + item 1 x)
+    ]
+
+    let rand random (inc)
+    set inc 0
+    let stopy true
+    foreach listShops [
+      x -> set inc (inc + item 1 x)
+      if rand < inc and stopy [set specificShop (item 0 x) set stopy false]
+    ]
+  ]
+  if shop = -2 [set specificShop entranceMall]
+end
+
+;This procedure is used by agents to enter the mall, it instantly moves them to the mall entrance
+to teleport [destination]
+  set xcor item 0 destination
+  set ycor item 1 destination
+end
+
+
+;This procedure is used by agents to move inside the mall, at each time step they will be able to move through up to a certain number of cases (patches)
+;specified in the interface
+to goTo [destination]
+  repeat nbStepsPerTick [
+    ifelse (xcor = item 0 destination and ycor = item 1 destination) [
+    ]
+    [
+      ifelse xcor != item 0 destination [
+        ifelse ycor != item 1 entranceMall [
+          ifelse ycor < item 1 entranceMall [
+            set ycor (ycor + 1)
+          ]
+          [
+            set ycor (ycor - 1)
+          ]
+        ]
+        [
+          ifelse xcor < item 0 destination [
+            set xcor (xcor + 1)
+          ]
+          [
+            set xcor (xcor - 1)
+          ]
+        ]
+      ]
+      [
+        ifelse ycor < item 1 destination [
+          set ycor (ycor + 1)
+        ]
+        [
+          set ycor (ycor - 1)
+        ]
+      ]
+    ]
+  ]
+end
+
+
+;This procedure returns the approximate number of time step needed for an agent to travel half the mall, it is used by agents to evaluate the time at which they need to go to the mall
+;taking the time need for movements into account
+to-report getAvgTravelTimeInMall
+  report ceiling((mallSize + 20) / (2 * nbStepsPerTick))
+end
+
+;This procedure returns the current time of the day
+to-report getCurrentTime
+  report (hour * 60 + minute)
+end
+
+;This procedure returns the opening time of a specified shop on the current day
+to-report getOpeningTime [shop]
+  if breed = Workers[
+    if day < 5 [
+      report (item 0 (item 0 (item shop openedTime)) * 60)
+    ]
+    if day > 4 [
+      report (item 1 (item 0 (item shop openedTime)) * 60)
+    ]
+  ]
+  if breed = Non-workers[
+    if day < 5 [
+      report (item 0 (item 0 (item shop openedTimeNon)) * 60)
+    ]
+    if day > 4 [
+      report (item 1 (item 0 (item shop openedTimeNon)) * 60)
+    ]
+  ]
+end
+
+
+;This procedure returns the closing time of a specified shop on the current day
+to-report getClosingTime [shop]
+  if breed = Workers [
+    if day < 5 [
+      report (item 0 (item 1 (item shop openedTime)) * 60)
+    ]
+    if day > 4 [
+      report (item 1 (item 1 (item shop openedTime)) * 60)
+    ]
+  ]
+  if breed = Non-workers [
+    if day < 5 [
+      report (item 1 (item 1 (item shop openedTimeNon)) * 60)
+    ]
+    if day > 4 [
+      report (item 1 (item 1 (item shop openedTimeNon)) * 60)
+    ]
+  ]
+end
+
+;This procedure returns a pessimist approximation of the time needed to execute a list of tasks
+to-report getApproxDuration [tasks]
+  let duration 0
+  if gender = "men" [
+    foreach tasks [
+    x -> set duration duration + ((item x durationMen) + (item x deviationMen) + (item x checkoutAv) + (item x deviationCheckout))
+    ]
+  ]
+  if gender = "women" [
+    foreach tasks [
+    x -> set duration duration + ((item x durationWomen) + (item x deviationWomen) + (item x checkoutAv) + (item x deviationCheckout))
+    ]
+  ]
+  report duration
+end
+
+;This procedure returns the average amount of time needed to execute a list of tasks
+to-report getAvgDuration [tasks]
+  let duration 0
+  if gender = "men" [
+    foreach tasks [
+    x -> set duration duration + ((item x durationMen) + (item x checkoutAv))
+    ]
+  ]
+  if gender = "women" [
+    foreach tasks [
+    x -> set duration duration + ((item x durationWomen) + (item x checkoutAv))
+    ]
+  ]
+  report duration
+end
+
+;This procedure returns the price the agent will have to pay for a specified task with respect to the project informations given
 to-report payPrice [shop]
   let price 0
   if breed = Workers [
@@ -361,82 +741,14 @@ to-report payPrice [shop]
     ]
   ]
   report price
-
-end
-
-to-report getApproxDuration [tasks]
-  let duration 0
-  if gender = "men" [
-    foreach tasks [
-    x -> set duration duration + ((item x durationMen) + (item x deviationMen) + (item x checkoutAv) + (item x deviationCheckout))
-    ]
-  ]
-  if gender = "women" [
-    foreach tasks [
-    x -> set duration duration + ((item x durationWomen) + (item x deviationWomen) + (item x checkoutAv) + (item x deviationCheckout))
-    ]
-  ]
-  report duration
-end
-
-to-report getAvgDuration [tasks]
-  let duration 0
-  if gender = "men" [
-    foreach tasks [
-    x -> set duration duration + ((item x durationMen) + (item x checkoutAv))
-    ]
-  ]
-  if gender = "women" [
-    foreach tasks [
-    x -> set duration duration + ((item x durationWomen) + (item x checkoutAv))
-    ]
-  ]
-  report duration
-end
-
-to-report getCurrentTime
-  report (hour * 60 + minute)
-end
-
-to-report getOpeningTime [shop]
-  if breed = Workers[
-    if day < 5 [
-      report (item 0 (item 0 (item shop openedTime)) * 60)
-    ]
-    if day > 4 [
-      report (item 1 (item 0 (item shop openedTime)) * 60)
-    ]
-  ]
-  if breed = Non-workers[
-    if day < 5 [
-      report (item 0 (item 0 (item shop openedTimeNon)) * 60)
-    ]
-    if day > 4 [
-      report (item 1 (item 0 (item shop openedTimeNon)) * 60)
-    ]
-  ]
-end
-
-to-report getClosingTime [shop]
-  if breed = Workers [
-    if day < 5 [
-      report (item 0 (item 1 (item shop openedTime)) * 60)
-    ]
-    if day > 4 [
-      report (item 1 (item 1 (item shop openedTime)) * 60)
-    ]
-  ]
-  if breed = Non-workers [
-    if day < 5 [
-      report (item 1 (item 1 (item shop openedTimeNon)) * 60)
-    ]
-    if day > 4 [
-      report (item 1 (item 1 (item shop openedTimeNon)) * 60)
-    ]
-  ]
 end
 
 
+
+
+
+
+;This procedure randomly generate a duration for a specified task with respect to the project informations given
 to-report getTimeTask [shop]
   if shop = 0 [
     report floor max list 5 ((30 - (sqrt 3) * 20 + random (2 * (sqrt 3) * 20)))
@@ -465,6 +777,7 @@ to-report getTimeTask [shop]
   ]
 end
 
+;This procedure randomly generate a duration for the checkout of a specified task with respect to the project informations given, if the task doesn't need checkout, the duration is set to 0
 to-report getTimeCheckout [shop]
   if shop = 0 [
     report (10 - (sqrt 3) * 5 + random (2 * (sqrt 3) * 5))
@@ -493,187 +806,57 @@ to-report getTimeCheckout [shop]
   ]
 end
 
-to-report setTime
-  let temp (list)
-  let tempbis needs
-  if targetedShop > -1 [set tempbis replace-item targetedShop tempbis ((item targetedShop tempbis) - 1)]
-  let counter -1
-  foreach tempbis [
-    x -> set counter (counter + 1)
-    if x > 0 [set temp lput counter temp]
+
+
+
+
+
+
+
+
+
+;This can be used in the interface generate csv file containing the history of the simulation
+;The files will be create following a path specified in the interface
+to printHistory
+  let days (list)
+  let daysStr (list)
+  let counter 0
+  set daysStr lput "Agent ID" daysStr
+  set daysStr lput "Agent Type" daysStr
+  repeat date [
+    set days lput counter days
+    set daysStr lput (word "Day " counter) daysStr
+    set counter (counter + 1)
   ]
-  if breed = Workers [
-    let minTime 0
-    let maxTime 1000000
-    if length temp > 1 [
-      let change  true
+  let final (list (list daysStr) (list daysStr) (list daysStr) (list daysStr) (list daysStr))
+  let turtleId 0
+  repeat count turtles [
+    ask turtle turtleId [
+      let temp [0 1 2 3 4]
       foreach temp [
-        x -> if getOpeningTime x > minTime [
-          set minTime getOpeningTime x
+        x ->
+        let tempList (list)
+        set tempList lput turtleId tempList
+        let tempBreed "Worker" if breed = Non-workers [set tempBreed "Non-Worker"]
+        set templist lput tempBreed tempList
+        foreach days [
+          y ->
+          set tempList lput (item x (item y myHistory)) tempList
         ]
-        let closingTime (getClosingTime x - getApproxDuration temp)
-        if closingTime < maxTime [
-          set maxTime closingTime
-        ]
-      ]
-      set change false
-      foreach temp [
-        x -> if getOpeningTime x < minTime [
-          ifelse getOpeningTime x < (minTime - getApproxDuration (list x)) [
-
-            set minTime (minTime - getApproxDuration (list x))
-            set change true
-          ]
-          [
-            set minTime getOpeningTime x
-            set change true
-          ]
-        ]
-        let closingTime (getClosingTime x - getApproxDuration temp)
-        if closingTime > maxTime [
-          ifelse closingTime > (maxTime + getApproxDuration (list x)) [
-            set maxTime (maxTime + getApproxDuration (list x))
-            set change true
-          ]
-          [
-            set maxTime closingTime
-            set change true
-          ]
-        ]
-      ]
-      set maxTime (maxTime - 30)
-      ifelse maxTime - minTime > 0 [
-        report (minTime + (random (maxTime - minTime)))
-      ]
-      [
-        report minTime
+        set final replace-item x final (lput (tempList) (item x final))
       ]
     ]
-    if length temp < 2 [
-      report -1
-    ]
+    set turtleId (turtleId + 1)
   ]
-
-  if breed = Non-workers [
-    foreach temp [
-        x -> if getCurrentTime > (getClosingTime x - getApproxDuration (list x) - 30) [
-          set temp (remove x temp)
-        ]
-      ]
-    if length temp > 0 [
-      let minTime 50000
-      foreach temp [
-        x -> let closingTime (getClosingTime x - getApproxDuration (list x) - 30)
-        let openingTime max list (getOpeningTime x) getCurrentTime
-        let temp2 openingTime
-        if(closingTime - openingTime) > 0 [set temp2 (openingTime + (random (closingTime - openingTime)))]
-        if temp2 < minTime [
-          set minTime temp2
-        ]
-      ]
-      report minTime
-    ]
-    if length temp = 0 [
-      report -1
-    ]
-  ]
+  csv:to-file word DirectoryPathForPrintHistory "\\logSupermarkets.csv" (item 0 final)
+  csv:to-file word DirectoryPathForPrintHistory "\\logRestaurants.csv" (item 1 final)
+  csv:to-file word DirectoryPathForPrintHistory "\\logHaidressers.csv" (item 2 final)
+  csv:to-file word DirectoryPathForPrintHistory "\\logHarware.csv" (item 3 final)
+  csv:to-file word DirectoryPathForPrintHistory "\\logClothes.csv" (item 4 final)
 end
 
 
-to-report selectTask
-  if breed = Workers [if length doneToday > 2[report -2]]
-  let temp (list)
-  let letsWait false
-
-  if breed = Workers [
-    let countery -1
-    foreach needs [
-      x ->
-      set countery (countery + 1)
-      if (x > 0) and ((member? countery doneToday) = false) [set temp lput countery temp]
-    ]
-  ]
-  if breed = Non-workers [
-    let countery -1
-    foreach needs [
-      x -> set countery (countery + 1)
-      if (x > 0) [set temp lput countery temp]
-    ]
-  ]
-
-  foreach temp [
-    x -> if getCurrentTime > (getClosingTime x - getAvgDuration (list x) - 20) [
-      set temp (remove x temp)
-    ]
-    if getCurrentTime < getOpeningTime x [
-      set temp (remove x temp)
-      set letsWait true
-    ]
-  ]
-  if (length temp = 0) and (letsWait = true) [
-    if (breed = Workers and inDay != day) [ report -2]
-    if (breed = Non-workers) [report -2]
-    report -1
-  ]
-  if (length temp = 0) and (letsWait = false) [
-    report -2
-  ]
-  if breed = Workers [
-    set temp (shuffle temp)
-    let minTime 100000
-    let minShop -10
-    ;if member? 1 temp [report 1]
-    foreach temp [
-      x -> let temp2 (getClosingTime x - getAvgDuration (list x))
-      if temp2 < minTime [
-        set minTime temp2
-        set minShop x
-      ]
-    ]
-    report minShop
-  ]
-  if breed = Non-workers [
-    set temp (shuffle temp)
-    report (item 0 temp)
-  ]
-end
-
-to setSpecificShopCoordinates [shop]
-  if shop >= 0 [
-
-    let listShops (item shop shopsInformations)
-    let nbRemainingEmployees (item shop nbEmployees)
-    if breed = Workers and targetedShop > 2[
-      foreach listShops [
-        x -> foreach (item (targetedShop - 3) visitedShops) [
-          y -> if y = (item 0 x) [
-            set nbRemainingEmployees (nbRemainingEmployees - item 1 x)
-            set listShops remove x listShops
-          ]
-        ]
-      ]
-    ]
-    let inc 0
-    foreach listShops [
-      x -> set inc (inc + item 1 x)
-    ]
-
-    let rand random (inc)
-    set inc 0
-    let stopy true
-    foreach listShops [
-      x -> set inc (inc + item 1 x)
-      if rand < inc and stopy [set specificShop (item 0 x) set stopy false]
-    ]
-  ]
-  if shop = -2 [set specificShop entranceMall]
-end
-
-TO-report getDaysString
-  let temp ["Monday" "Tuesday" "Wednesday" "Thursday" "Friday" "Saturday" "Sunday"]
-  report (item day temp)
-end
-
+;This procedure is used during setup, to setup the informations specific to the problem as they were mentionned in project information file provided
 to setupInformations
   set date 0
   set day 0
@@ -692,6 +875,8 @@ to setupInformations
   set shopIncomes [0 0 0 0 0]
 end
 
+
+;This procedure is used to setup every part of the simulation
 to setup
   clear-all
   reset-ticks
@@ -699,6 +884,7 @@ to setup
   let total-store number-supermarket + number-restaurant + number-clothes + number-Hardware-store + number-hairdresser
   let x round (total-store / 2) * 5 + 1
   resize-world -1 * x x -16 16
+  set mallSize (2 * x + 1)
 
   let mylist []
   let  i -1 * x + 6
@@ -715,7 +901,7 @@ to setup
   ;ask patches with [pxcor < 10 and pycor < 5 and  pxcor > -10 and pycor > -5 ] [ set pcolor gray ]
 
   ; create The Workers
-  create-Workers 325 [
+  create-Workers (floor (nbWorkers / 2)) [
     set shape "person"
     set color white
     set gender "men"
@@ -730,12 +916,13 @@ to setup
     set specificShop (list)
     set state "out"
     set inDay -1
+    set myHistory (list [0 0 0 0 0])
 
 
 
 
   ]
- create-Workers 325 [
+ create-Workers (ceiling (nbWorkers / 2)) [
 
     set shape "person"
     set color white
@@ -751,11 +938,12 @@ to setup
     set specificShop (list)
     set state "out"
     set inDay -1
+    set myHistory (list [0 0 0 0 0])
   ]
 
 
   ; create The Non-Workers
-  create-Non-workers 175 [
+  create-Non-workers (ceiling (nbNonWorkers / 2)) [
     set shape "person"
     set color green
     set gender "men"
@@ -767,8 +955,9 @@ to setup
     set taskDuration 0
     set specificShop (list)
     set state "out"
+    set myHistory (list [0 0 0 0 0])
   ]
-  create-Non-workers 175[
+  create-Non-workers (floor (nbNonWorkers / 2))[
 
     set shape "person"
     set color green
@@ -782,6 +971,7 @@ to setup
     set taskDuration 0
     set specificShop (list)
     set state "out"
+    set myHistory (list [0 0 0 0 0])
   ]
 
    ; yellow : supermarkets,  orange : restaurant,  magenta : clothes,  blue : hardware & electronic store   pink : hairdresser
@@ -935,8 +1125,9 @@ to setup
     set tempo (tempo + 1)
   ]
 
-  ask turtles [setNeeds
-  set timeToGo setTime]
+  ask turtles [
+    setNeeds
+    set timeToGo setTime]
   set nbEmployees [0 0 0 0 0]
   let tempy12 0
   while [tempy12 < length shopsInformations] [
@@ -947,9 +1138,9 @@ to setup
   ]
 
 
-END
+end
 
-
+;This procedure is used to setup the central alley of the mall, where the agent can walk
 to setup-mall
 
   if ( pycor = 4 ) [ set pcolor grey ]
@@ -967,7 +1158,7 @@ to setup-mall
 end
 
 
-
+;This procedure is used to setup the incomes of the agents
 to init-income
 
   ask Workers [
@@ -1187,7 +1378,7 @@ end
 GRAPHICS-WINDOW
 615
 16
-1832
+1962
 454
 -1
 -1
@@ -1201,8 +1392,8 @@ GRAPHICS-WINDOW
 1
 1
 1
--46
-46
+-51
+51
 -16
 16
 1
@@ -1212,9 +1403,9 @@ ticks
 30.0
 
 BUTTON
+11
 10
-10
-73
+74
 43
 NIL
 setup\n
@@ -1230,9 +1421,9 @@ NIL
 
 SLIDER
 0
-42
+102
 116
-75
+135
 number-supermarket
 number-supermarket
 1
@@ -1245,9 +1436,9 @@ HORIZONTAL
 
 SLIDER
 0
-162
+222
 115
-195
+255
 number-hairdresser
 number-hairdresser
 1
@@ -1260,9 +1451,9 @@ HORIZONTAL
 
 SLIDER
 0
-221
+281
 114
-254
+314
 number-Hardware-store
 number-Hardware-store
 1
@@ -1275,9 +1466,9 @@ HORIZONTAL
 
 SLIDER
 0
-277
+337
 114
-310
+370
 number-clothes
 number-clothes
 1
@@ -1290,14 +1481,14 @@ HORIZONTAL
 
 SLIDER
 0
-101
+161
 115
-134
+194
 number-restaurant
 number-restaurant
 1
 50
-3.0
+5.0
 1
 1
 NIL
@@ -1305,20 +1496,20 @@ HORIZONTAL
 
 INPUTBOX
 114
-43
-202
 103
+202
+163
 NumberCheckout
-20.0
+25.0
 1
 0
 Number
 
 INPUTBOX
 114
-160
-202
 220
+202
+280
 NumberOfSeatsHairdresser
 24.0
 1
@@ -1327,9 +1518,9 @@ Number
 
 INPUTBOX
 114
-278
-202
 338
+202
+398
 NumberAssistantsCloth
 18.0
 1
@@ -1338,20 +1529,20 @@ Number
 
 INPUTBOX
 114
-101
-201
 161
+201
+221
 NumberOfSeatsRestaurant
-140.0
+250.0
 1
 0
 Number
 
 INPUTBOX
 113
-219
-202
 279
+202
+339
 NumberAssistantsHardware
 10.0
 1
@@ -1359,9 +1550,9 @@ NumberAssistantsHardware
 Number
 
 BUTTON
-104
+74
 10
-167
+137
 43
 go
 go
@@ -1399,10 +1590,10 @@ PENS
 "waitClothes" 1.0 0 -10899396 true "" "plot item 0 (item 4 waitingTimes)"
 
 PLOT
-201
-16
-615
-279
+200
+20
+614
+283
 Average Income per shop
 time
 Income
@@ -1421,10 +1612,10 @@ PENS
 "clothes" 1.0 0 -13840069 true "" "plot (((item 4 shopIncomes) / number-clothes))"
 
 MONITOR
-5
-352
-94
-397
+614
+454
+703
+499
 Nb days passed
 date
 17
@@ -1432,10 +1623,10 @@ date
 11
 
 MONITOR
-4
-417
-72
-462
+614
+499
+682
+544
 Day
 getDaysString
 17
@@ -1443,10 +1634,10 @@ getDaysString
 11
 
 MONITOR
-71
-417
-121
-462
+681
+499
+731
+544
 Hour
 hour
 17
@@ -1454,15 +1645,186 @@ hour
 11
 
 MONITOR
-121
-417
-171
-462
+731
+499
+781
+544
 Minute
 minute
 17
 1
 11
+
+MONITOR
+804
+500
+898
+545
+nbInSupermarket
+item 0 currentInMall
+17
+1
+11
+
+MONITOR
+804
+455
+899
+500
+TotalNeedSupermarket
+item 0 totalNumberofNeeds
+17
+1
+11
+
+INPUTBOX
+0
+405
+71
+465
+nbWorkers
+650.0
+1
+0
+Number
+
+INPUTBOX
+71
+405
+142
+465
+nbNonWorkers
+350.0
+1
+0
+Number
+
+MONITOR
+898
+455
+993
+500
+TotalNeedRestaurant
+item 1 totalNumberofNeeds
+17
+1
+11
+
+MONITOR
+992
+454
+1087
+499
+TotalNeedHairdresser
+item 2 totalNumberofNeeds
+17
+1
+11
+
+MONITOR
+1086
+454
+1181
+499
+TotalNeedHardware
+item 3 totalNumberofNeeds
+17
+1
+11
+
+MONITOR
+1180
+454
+1274
+499
+TotalNeedClothes
+item 4 totalNumberofNeeds
+17
+1
+11
+
+MONITOR
+897
+499
+998
+544
+nbInRestaurant
+item 1 currentInMall
+17
+1
+11
+
+MONITOR
+992
+499
+1093
+544
+nbInHairdresser
+item 2 currentInMall
+17
+1
+11
+
+MONITOR
+1086
+499
+1181
+544
+nbInHardware
+item 3 currentInMall
+17
+1
+11
+
+MONITOR
+1180
+498
+1274
+543
+nbInClothes
+item 4 currentInMall
+17
+1
+11
+
+INPUTBOX
+0
+463
+142
+523
+nbStepsPerTick
+2.0
+1
+0
+Number
+
+INPUTBOX
+60
+43
+200
+103
+DirectoryPathForPrintHistory
+C:\\\\Users\\\\alexi\\\\Desktop\\\\test
+1
+0
+String
+
+BUTTON
+136
+10
+200
+43
+NIL
+printHistory
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 # Documentation
@@ -1476,11 +1838,14 @@ The interface of the file proposes :
     * pink for hairdressers
     * blue for hardware stores
     * magenta for clothes stores
+  * buttons, one to setup the problem, one to launch (or resume) the simulation (on setup, all agents are considered to be outside the mall) and a last one to create the csv files containing the simulation history, the button creates the files in a directory whose adress is to be specified in the input area named DirectoryPathForPrintHistory.
   * sliders, to parametrize the number of each shop type in the mall.
   * input areas, to parametrize the total number employees for a shop type to be dispatches in the different shops of said type. During setup, employees are dispatched in a way to fully fill as many shops as possible, if we paraetrize 3 supermarkets and 5 employees, one supermarket will have the 5 employees and the other two will never be used. If the user parametrize to many employees compared to the chosen number of shop, the excess will simply be ignored.
+  * other input areas, to specify the number of agents to create for the simulation or to specify how many movements an agent is allowed to do per time step, as we add more and more shops, the mall will get bigger and it will start taking a lot of time for the agents to navigate the mall so we made the speed of movement adjustable to counter this problem.
   * displayers, to display at all times, the number of days passed since the beginning of the simulation and the current day, hour and minute.
+  * other displayers, o display at all times, the number of agents currently inside each store type and the total number of needs of the agents for each type of task.
   * plots, the provided interface proposes two plots, one displaying the average waiting times for the different services, the other to display the average accumulated income per shop for each shop type.
-  * buttons, one to setup the problem, the other to launch (or resume) the simulation (on setup, all agents are considered to be outside the mall).
+
 
 This simulation doesn't represent the agents while they are out of the mall, we consider here that, whenever they need to go to the mall, they instantly enter it.  
 For simplicity, in the simulation, we don't represent the movements of the agents inside the shops while they are executing tasks, they simply enter the shop stay 
